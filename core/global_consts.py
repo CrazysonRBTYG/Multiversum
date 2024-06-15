@@ -1,5 +1,5 @@
 # Игровые состояния
-STATE_MENU = 0
+STATE_MAIN_MENU = 0
 
 
 GAME_NAME = "Multiversum"

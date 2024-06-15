@@ -19,7 +19,7 @@ class GameLogic:
 
         self.is_running = True
         self.event_handler.post(InitializeEvent())
-        self.state.push(STATE_MENU)
+        self.state.push(STATE_MAIN_MENU)
         while self.is_running:
             self.event_handler.post(TickEvent())
     
