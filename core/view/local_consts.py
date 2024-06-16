@@ -1,6 +1,7 @@
 from eventmanager.events import *
 
 RESOLUTION = (1920, 1080)
+FULLSCREEN = True
 FPS = 60
 
 # MAIN MENU

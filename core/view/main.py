@@ -53,6 +53,9 @@ class Drawer:
 
         pygame.init()
         pygame.display.set_caption(GAME_NAME)
-        self._screen = pygame.display.set_mode(RESOLUTION, pygame.FULLSCREEN)
+        if FULLSCREEN:
+            self._screen = pygame.display.set_mode(RESOLUTION, pygame.FULLSCREEN)
+        else:
+            self._screen = pygame.display.set_mode(RESOLUTION)
         self._clock = pygame.time.Clock()
         self._is_initialized = True
