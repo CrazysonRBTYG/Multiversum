@@ -32,7 +32,12 @@ class Drawer:
             current_state = self.model.state.peek()
             if current_state == STATE_MAIN_MENU:
                 self.main_menu.draw(self.screen)
+                self.event_handler.post(self.main_menu.do())
             self.clock.tick(FPS)
+        if isinstance(event, InputEvent):
+            current_state = self.model.state.peek()
+            if current_state == STATE_MAIN_MENU:
+                self.main_menu.button_click(self.screen, event.click_pos)
     
     def _initialize(self):
         """

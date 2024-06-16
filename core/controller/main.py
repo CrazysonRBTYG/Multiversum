@@ -21,5 +21,14 @@ class InputHandler:
                 if event.type == pygame.QUIT:
                     self.event_handler.post(QuitEvent())
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        self.event_handler.post(StateChangeEvent(None))
+                    current_state = self.model.state.peek()
+                    if current_state == STATE_MAIN_MENU:
+                        self.main_menu_keydown(event)
+                if event.type == pygame.MOUSEBUTTONUP:
+                    current_state = self.model.state.peek()
+                    if current_state == STATE_MAIN_MENU:
+                        self.main_menu_keydown(event)
+    
+    def main_menu_keydown(self, event):
+        if event.type == pygame.MOUSEBUTTONUP:
+            self.event_handler.post(InputEvent(None, pygame.mouse.get_pos()))
