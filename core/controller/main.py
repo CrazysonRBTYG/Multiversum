@@ -31,7 +31,13 @@ class InputHandler:
                     current_state = self._model.state.peek()
                     if current_state == STATE_MAIN_MENU:
                         self.main_menu_keydown(event)
+                    if current_state == STATE_SETTINGS_MENU:
+                        self.settings_menu_keydown(event)
     
     def main_menu_keydown(self, event):
+        if event.type == pygame.MOUSEBUTTONUP:
+            self._event_handler.post(InputEvent(None, pygame.mouse.get_pos()))
+    
+    def settings_menu_keydown(self, event):
         if event.type == pygame.MOUSEBUTTONUP:
             self._event_handler.post(InputEvent(None, pygame.mouse.get_pos()))

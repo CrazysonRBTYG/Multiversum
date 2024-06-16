@@ -19,6 +19,7 @@ class Drawer:
         self._screen: pygame.Surface = None
         self._clock: pygame.time.Clock = None
         self._main_menu: view.menus.MainMenu = view.menus.MainMenu()
+        self._settings_menu: view.menus.SettingsMenu = view.menus.SettingsMenu()
     
     def update(self, event: Event):
         """
@@ -38,6 +39,9 @@ class Drawer:
             if current_state == STATE_MAIN_MENU:
                 self._main_menu.draw(self._screen)
                 self._event_handler.post(self._main_menu.do())
+            if current_state == STATE_SETTINGS_MENU:
+                self._settings_menu.draw(self._screen)
+                self._event_handler.post(self._settings_menu.do())
             self._clock.tick(FPS)
         if isinstance(event, InputEvent):
             if not self._is_initialized:
@@ -45,6 +49,8 @@ class Drawer:
             current_state = self._model.state.peek()
             if current_state == STATE_MAIN_MENU:
                 self._main_menu.button_click(event.click_pos)
+            if current_state == STATE_SETTINGS_MENU:
+                self._settings_menu.button_click(event.click_pos)
     
     def _initialize(self):
         """
