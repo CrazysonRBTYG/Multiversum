@@ -1,4 +1,9 @@
-from view.imports import *
+import pygame
+import view.menus
+from model.main import GameLogic
+from eventmanager.main import *
+from global_consts import *
+from view.local_consts import *
 
 
 class Drawer:
@@ -7,14 +12,13 @@ class Drawer:
     """
 
     def __init__(self, event_handler: EventHandler, game_model: GameLogic):
-        self.event_handler: EventHandler = event_handler
+        self._event_handler: EventHandler = event_handler
         event_handler.add_reciever(self)
-        self.model: GameLogic = game_model
-        self.is_initialized: bool = False
-        self.screen: pygame.Surface = None
-        self.clock: pygame.time.Clock = None
-
-        self.main_menu = view.menus.MainMenu()
+        self._model: GameLogic = game_model
+        self._is_initialized: bool = False
+        self._screen: pygame.Surface = None
+        self._clock: pygame.time.Clock = None
+        self._main_menu: view.menus.MainMenu = view.menus.MainMenu()
     
     def update(self, event: Event):
         """
@@ -24,20 +28,23 @@ class Drawer:
         if isinstance(event, InitializeEvent):
             self._initialize()
         if isinstance(event, QuitEvent):
-            self.is_initialized = False
+            self._is_initialized = False
             pygame.quit()
+            exit() # без этого программа продолжает работать в файле controller/main.py (не выявил причину)
         if isinstance(event, TickEvent):
-            if not self.is_initialized:
+            if not self._is_initialized:
                 return
-            current_state = self.model.state.peek()
+            current_state = self._model.state.peek()
             if current_state == STATE_MAIN_MENU:
-                self.main_menu.draw(self.screen)
-                self.event_handler.post(self.main_menu.do())
-            self.clock.tick(FPS)
+                self._main_menu.draw(self._screen)
+                self._event_handler.post(self._main_menu.do())
+            self._clock.tick(FPS)
         if isinstance(event, InputEvent):
-            current_state = self.model.state.peek()
+            if not self._is_initialized:
+                return
+            current_state = self._model.state.peek()
             if current_state == STATE_MAIN_MENU:
-                self.main_menu.button_click(self.screen, event.click_pos)
+                self._main_menu.button_click(self._screen, event.click_pos)
     
     def _initialize(self):
         """
@@ -46,6 +53,6 @@ class Drawer:
 
         pygame.init()
         pygame.display.set_caption(GAME_NAME)
-        self.screen = pygame.display.set_mode(RESOLUTION, pygame.FULLSCREEN)
-        self.clock = pygame.time.Clock()
-        self.is_initialized = True
+        self._screen = pygame.display.set_mode(RESOLUTION, pygame.FULLSCREEN)
+        self._clock = pygame.time.Clock()
+        self._is_initialized = True

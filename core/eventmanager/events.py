@@ -4,7 +4,7 @@ class Event:
     """
 
     def __init__(self):
-        self.name = "Common (Generic) Event"
+        self._name = "Common (Generic) Event"
 
 
 class TickEvent(Event):
@@ -13,7 +13,7 @@ class TickEvent(Event):
     """
 
     def __init__(self):
-        self.name = "Tick Event"
+        self._name = "Tick Event"
 
 
 class QuitEvent(Event):
@@ -22,7 +22,7 @@ class QuitEvent(Event):
     """
 
     def __init__ (self):
-        self.name = "Quit Event"
+        self._name = "Quit Event"
 
 
 class InputEvent(Event):
@@ -31,8 +31,8 @@ class InputEvent(Event):
     """
 
     def __init__(self, input_key, click_position):
-        self.name = "Input Event"
-        self.i_key = input_key
+        self._name = "Input Event"
+        self._input_key = input_key
         self.click_pos = click_position
 
 
@@ -42,7 +42,7 @@ class InitializeEvent(Event):
     """
     
     def __init__ (self):
-        self.name = "Initialize Event"
+        self._name = "Initialize Event"
 
 
 class StateChangeEvent(Event):
@@ -51,5 +51,5 @@ class StateChangeEvent(Event):
     """
 
     def __init__(self, state):
-        self.name = "State Change Event"
+        self._name = "State Change Event"
         self.state = state

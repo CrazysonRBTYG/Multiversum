@@ -1,4 +1,5 @@
-from model.imports import *
+from global_consts import *
+from eventmanager.main import *
 
 
 class GameLogic:
@@ -7,9 +8,9 @@ class GameLogic:
     """
 
     def __init__(self, event_handler: EventHandler):
-        self.event_handler: EventHandler = event_handler
+        self._event_handler: EventHandler = event_handler
         event_handler.add_reciever(self)
-        self.is_running: bool = False
+        self._is_running: bool = False
         self.state: StateChanger = StateChanger()
     
     def run(self):
@@ -17,11 +18,11 @@ class GameLogic:
         Запуск игрового цикла
         """
 
-        self.is_running = True
-        self.event_handler.post(InitializeEvent())
+        self._is_running = True
+        self._event_handler.post(InitializeEvent())
         self.state.push(STATE_MAIN_MENU)
-        while self.is_running:
-            self.event_handler.post(TickEvent())
+        while self._is_running:
+            self._event_handler.post(TickEvent())
     
     def update(self, event: Event):
         """
@@ -29,11 +30,11 @@ class GameLogic:
         """
 
         if isinstance(event, QuitEvent):
-            self.is_running = False
+            self._is_running = False
         if isinstance(event, StateChangeEvent):
             if not event.state:
                 if not self.state.pop():
-                    self.event_handler.post(QuitEvent())
+                    self._event_handler.post(QuitEvent())
             else:
                 self.state.push(event.state)
 
@@ -44,14 +45,14 @@ class StateChanger:
     """
 
     def __init__ (self):
-        self.stack = []
+        self._stack = []
     
     def push(self, state: int) -> int:
         """
         Добавляет новое игровое состояние в стек и возвращает его
         """
 
-        self.stack.append(state)
+        self._stack.append(state)
         return state
 
     def pop(self) -> int | None:
@@ -60,8 +61,8 @@ class StateChanger:
         """
 
         try:
-            self.stack.pop()
-            return len(self.stack) > 0
+            self._stack.pop()
+            return len(self._stack) > 0
         except IndexError:
             return None
     
@@ -71,6 +72,6 @@ class StateChanger:
         """
 
         try:
-            return self.stack[-1]
+            return self._stack[-1]
         except IndexError:
             return None
