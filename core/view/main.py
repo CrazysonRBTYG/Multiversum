@@ -44,7 +44,7 @@ class Drawer:
                 return
             current_state = self._model.state.peek()
             if current_state == STATE_MAIN_MENU:
-                self._main_menu.button_click(self._screen, event.click_pos)
+                self._main_menu.button_click(event.click_pos)
     
     def _initialize(self):
         """

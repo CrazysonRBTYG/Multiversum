@@ -73,7 +73,7 @@ class MainMenu:
         self._animations.update(speed=MAIN_MENU_BUTTON_CLICK_SPEED)
         pygame.display.flip()
     
-    def button_click(self, where, click_pos):
+    def button_click(self, click_pos):
         """
         Нажатие на кнопку и получение следующего события после него
         """
@@ -83,7 +83,7 @@ class MainMenu:
                 self._next_event = but.func
                 self._is_any_button_clicked = True
     
-    def do(self):
+    def do(self) -> Event:
         """
         Возврат события после нажатия на кнопку (если нажата)
         """
