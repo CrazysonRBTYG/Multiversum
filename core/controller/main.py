@@ -23,7 +23,7 @@ class InputHandler:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self._event_handler.post(QuitEvent())
-                if event.type == pygame.KEYDOWN:
+                if event.type == pygame.KEYUP:
                     current_state = self._model.state.peek()
                     if current_state == STATE_MAIN_MENU:
                         self.main_menu_keydown(event)
