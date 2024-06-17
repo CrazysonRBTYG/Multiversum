@@ -16,8 +16,6 @@ MAIN_MENU_BUTTONS = {"PLAY": {"path": "core/view/assets/main_menu/play_button",
                               "func": None},
                     "COLLECTION": {"path": "core/view/assets/main_menu/collection_button",
                                    "func": None},
-                    "SETTINGS": {"path": "core/view/assets/main_menu/settings_button",
-                                 "func": None},
                     "EXIT": {"path": "core/view/assets/main_menu/exit_button",
                              "func": QuitEvent()}}
 _buttons_amount = len(MAIN_MENU_BUTTONS)
