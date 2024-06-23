@@ -19,6 +19,7 @@ class Drawer:
         self._screen: pygame.Surface = None
         self._clock: pygame.time.Clock = None
         self._main_menu: view.menus.MainMenu = view.menus.MainMenu()
+        self._game_menu: view.menus.GameMenu = view.menus.GameMenu()
     
     def update(self, event: Event):
         """
@@ -38,6 +39,13 @@ class Drawer:
             if current_state == STATE_MAIN_MENU:
                 self._main_menu.draw(self._screen)
                 self._event_handler.post(self._main_menu.do())
+            if current_state == STATE_GAME:
+                self._game_menu.draw(self._screen, self._model.game.board)
+                if self._model.game.find_matches():
+                    if self._model.game.remove_matches() != 0:
+                        self._model.game.drop_tiles()
+                        pygame.time.wait(500)
+                self._game_menu.draw(self._screen, self._model.game.board)
             self._clock.tick(FPS)
         if isinstance(event, InputEvent):
             if not self._is_initialized:
@@ -45,6 +53,12 @@ class Drawer:
             current_state = self._model.state.peek()
             if current_state == STATE_MAIN_MENU:
                 self._main_menu.button_click(event.click_pos)
+            if current_state == STATE_GAME:
+                self._game_menu.match_click(event.click_pos)
+                if self._game_menu.do() is not None:
+                    if self._model.game.make_move(*self._game_menu.do()) == False:
+                        self._model.game.moves += 1
+                    self._game_menu.move = None
     
     def _initialize(self):
         """

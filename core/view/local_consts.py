@@ -1,19 +1,22 @@
 from eventmanager.events import *
+from global_consts import *
+from model.local_consts import *
 
 RESOLUTION = (1920, 1080)
 FULLSCREEN = True
 FPS = 60
 
+BACKGROUND = {"path": "core/view/assets/main_menu/background.gif",
+              "coords": (0, 0)}
+
 # MAIN MENU
-MAIN_MENU_BACKGROUND = {"path": "core/view/assets/main_menu/background.gif",
-                        "coords": (0, 0)}
 _main_menu_button_width = RESOLUTION[0] * 9 // 32 # коэффициенты добыты экспериментальным путем
 _main_menu_button_height = RESOLUTION[1] * 41 // 360 # и эти тоже
 MAIN_MENU_BUTTONS_TRANSFORM_RESOLUTION = (_main_menu_button_width, _main_menu_button_height)
 MAIN_MENU_BUTTON_CLICK_SPEED = 0.4
 MAIN_MENU_BUTTON_WAIT_AFTER_CLICK = 50
 MAIN_MENU_BUTTONS = {"PLAY": {"path": "core/view/assets/main_menu/play_button",
-                              "func": None},
+                              "func": StateChangeEvent(STATE_GAME)},
                     "COLLECTION": {"path": "core/view/assets/main_menu/collection_button",
                                    "func": None},
                     "EXIT": {"path": "core/view/assets/main_menu/exit_button",
@@ -26,3 +29,24 @@ _space_between_buttons = (_last - _first - (_buttons_amount - 1)
 for but in MAIN_MENU_BUTTONS.keys():
     MAIN_MENU_BUTTONS[but]["coords"] = (RESOLUTION[0]//2, _first)
     _first += _space_between_buttons + _main_menu_button_height
+
+# GAME
+_char_cell_width = RESOLUTION[0] * 15 // 64
+_char_cell_height = RESOLUTION[1] * 92 // 135
+CHAR_CELL_TRANSFORM_RESOLUTION = (_char_cell_width, _char_cell_height)
+CHAR_CELL_COORDS = (RESOLUTION[0] * 163 // 1920, RESOLUTION[1] * 49 // 1080)
+CHAR_CELL_PATH = "core/view/assets/game/character-cell.png"
+_stats_cell_width = _char_cell_width
+_stats_cell_height = RESOLUTION[1] // 5
+STATS_CELL_TRANSFORM_RESOLUTION = (_stats_cell_width, _stats_cell_height)
+STATS_CELL_COORDS = (RESOLUTION[0] * 163 // 1920, RESOLUTION[1] * 817 // 1080)
+STATS_CELL_PATH = "core/view/assets/game/stats.png"
+_board_width = RESOLUTION[0] * 41 // 80
+_board_height = RESOLUTION[1] * 41 // 45
+_match_cell_width = _board_width // MATCH3_COLS * 140 // 123
+_match_cell_height = _board_height // MATCH3_ROWS * 140 // 123
+MATCH_CELL_TRANSFORM_RESOLUTION = (_match_cell_width, _match_cell_height)
+MATCH_CELL_START_COORDS = (RESOLUTION[0] * 775 // 1920, RESOLUTION[1] * 49 // 1080)
+MATCH_CELL_PATH = "core/view/assets/game/cell.png"
+MATCH_CELL_W_INC = _match_cell_width * 6 // 7
+MATCH_CELL_H_INC = _match_cell_height * 6 // 7

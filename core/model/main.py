@@ -1,5 +1,6 @@
 from global_consts import *
 from eventmanager.main import *
+from model.match3 import Match3Game
 
 
 class GameLogic:
@@ -12,6 +13,9 @@ class GameLogic:
         event_handler.add_reciever(self)
         self._is_running: bool = False
         self.state: StateChanger = StateChanger()
+
+        self.game = Match3Game()
+        self.game_board = self.game.board
     
     def run(self):
         """
@@ -37,7 +41,9 @@ class GameLogic:
                     self._event_handler.post(QuitEvent())
             else:
                 self.state.push(event.state)
-
+        if isinstance(event, TickEvent):
+            if self.state.peek() == STATE_GAME:
+                self.game_board = self.game.board
 
 class StateChanger:
     """

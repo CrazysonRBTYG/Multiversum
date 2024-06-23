@@ -8,7 +8,7 @@ class Button(pygame.sprite.Sprite):
     Шаблон кнопки по спрайту/анимации
     """
 
-    def __init__(self, event: Event, x: int, y: int, path, sprite_transform_resolution: tuple[int, int]):
+    def __init__(self, event: Event, x: int, y: int, path: str, sprite_transform_resolution: tuple[int, int]):
         super().__init__()
         sprites_amount: int = len([entry for entry in os.listdir(path) 
                                     if os.path.isfile(os.path.join(path, entry))])
@@ -42,3 +42,28 @@ class Button(pygame.sprite.Sprite):
 
         self.is_animating = True
 
+
+class Image:
+    """
+    Шаблон изображения
+    """
+
+    def __init__(self, x: int, y: int, path: str, sprite_transform_resolution: tuple[int, int]):
+        self.path = path
+        self._transform_res = sprite_transform_resolution
+        self._xy_rect = (x, y)
+        self._sprite: pygame.Surface = pygame.transform.scale(pygame.image.load(path), sprite_transform_resolution)
+        self.rect = self._sprite.get_rect()
+        self.rect.topleft = (x, y)
+    
+    def draw(self, where: pygame.Surface):
+        """
+        
+        """
+
+        where.blit(self._sprite, self.rect)
+    
+    def update(self, path: str):
+        self._sprite: pygame.Surface = pygame.transform.scale(pygame.image.load(path), self._transform_res)
+        self.rect = self._sprite.get_rect()
+        self.rect.topleft = self._xy_rect

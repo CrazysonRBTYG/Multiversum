@@ -1,6 +1,7 @@
 import pygame
 import gif_pygame
 from view.local_consts import *
+from model.local_consts import *
 from view.interface_elements import *
 from eventmanager.events import *
 
@@ -11,9 +12,9 @@ class MainMenu:
     """
 
     def __init__(self):
-        self._background_image: gif_pygame.GIFPygame = gif_pygame.load(MAIN_MENU_BACKGROUND["path"])
+        self._background_image: gif_pygame.GIFPygame = gif_pygame.load(BACKGROUND["path"])
         gif_pygame.transform.scale(self._background_image, RESOLUTION)
-        self._background_image_pos: tuple[int, int] = MAIN_MENU_BACKGROUND["coords"]
+        self._background_image_pos: tuple[int, int] = BACKGROUND["coords"]
         self._buttons: list[Button] = [
                 Button(MAIN_MENU_BUTTONS[i]["func"],
                 *MAIN_MENU_BUTTONS[i]["coords"],
@@ -66,3 +67,70 @@ class MainMenu:
         if self._is_any_button_clicked and self._are_all_animations_ended:
             pygame.time.wait(MAIN_MENU_BUTTON_WAIT_AFTER_CLICK) # микро пауза (можно отключить)
             return self._next_event
+
+
+class GameMenu:
+    """
+    Шаблон меню, отображающегося во время игры
+    """
+
+    def __init__(self):
+        self._background_image: gif_pygame.GIFPygame = gif_pygame.load(BACKGROUND["path"])
+        gif_pygame.transform.scale(self._background_image, RESOLUTION)
+        self._background_image_pos: tuple[int, int] = BACKGROUND["coords"]
+        self._char_cell: Image = Image(*CHAR_CELL_COORDS, CHAR_CELL_PATH, CHAR_CELL_TRANSFORM_RESOLUTION)
+        self._stats_cell: Image = Image(*STATS_CELL_COORDS, STATS_CELL_PATH, STATS_CELL_TRANSFORM_RESOLUTION)
+        self._x_ind = MATCH_CELL_START_COORDS[0]
+        self._y_ind = MATCH_CELL_START_COORDS[1]
+        self._clicked_match = None
+        self.move = None
+        self._game_board: list[list[Image]] = []
+        self._game_board_colors: list[list[Image]] = []
+        for _ in range(MATCH3_ROWS):
+            temp = []
+            temp2 = []
+            for _ in range(MATCH3_COLS):
+                temp.append(Image(*(self._x_ind, self._y_ind), MATCH_CELL_PATH, MATCH_CELL_TRANSFORM_RESOLUTION))
+                temp2.append(Image(*(self._x_ind, self._y_ind), f"core/view/assets/game/matches/0.png", MATCH_CELL_TRANSFORM_RESOLUTION))
+                self._x_ind += MATCH_CELL_W_INC
+            self._game_board.append(temp)
+            self._game_board_colors.append(temp2)
+            self._y_ind += MATCH_CELL_H_INC
+            self._x_ind = MATCH_CELL_START_COORDS[0]
+
+    
+    def draw(self, where: pygame.Surface, board: list[list[int]]):
+        """
+        Визуальное отображение всех компонентов
+        """
+
+        self._background_image.render(where, self._background_image_pos)
+        self._char_cell.draw(where)
+        self._stats_cell.draw(where)
+        for y in range(MATCH3_ROWS):
+            for x in range(MATCH3_COLS):
+                if self._clicked_match == (y, x):
+                    self._game_board_colors[y][x].update(f"core/view/assets/game/matches/{board[y][x]}_clicked.png")
+                else:
+                    self._game_board_colors[y][x].update(f"core/view/assets/game/matches/{board[y][x]}.png")
+        for i in range(len(self._game_board)):
+            for j in range(len(self._game_board[0])):
+                self._game_board[i][j].draw(where)
+                self._game_board_colors[i][j].draw(where)
+        pygame.display.flip()
+    
+    def match_click(self, click_pos: tuple[int, int]):
+        for y in range(MATCH3_ROWS):
+            for x in range(MATCH3_COLS):
+                if self._game_board_colors[y][x].rect.collidepoint(click_pos):
+                    if self._clicked_match == (y, x):
+                        self._clicked_match = None
+                    elif self._clicked_match is not None:
+                        self.move = (*self._clicked_match, y, x)
+                        self._clicked_match = None
+                    else:
+                        self._clicked_match = (y, x)
+    
+    def do(self):
+        if self.move is not None:
+            return self.move
