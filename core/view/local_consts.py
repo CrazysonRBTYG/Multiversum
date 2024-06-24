@@ -6,6 +6,8 @@ RESOLUTION = (1920, 1080)
 FULLSCREEN = True
 FPS = 60
 
+FONT = "core/view/assets/PIXY.ttf"
+
 BACKGROUND = {"path": "core/view/assets/main_menu/background.gif",
               "coords": (0, 0)}
 

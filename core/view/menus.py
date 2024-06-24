@@ -77,6 +77,7 @@ class GameMenu:
     """
 
     def __init__(self):
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         self._background_image: gif_pygame.GIFPygame = gif_pygame.load(BACKGROUND["path"])
         gif_pygame.transform.scale(self._background_image, RESOLUTION)
         self._background_image_pos: tuple[int, int] = BACKGROUND["coords"]
@@ -99,14 +100,16 @@ class GameMenu:
             self._game_board_colors.append(temp2)
             self._y_ind += MATCH_CELL_H_INC
             self._x_ind = MATCH_CELL_START_COORDS[0]
-        self._stats_font = pygame.font.Font("core/view/assets/PIXY.ttf", 64)
+        self._stats_font = pygame.font.Font(FONT, 64)
+        self._game_over_font = pygame.font.Font(FONT, 150)
+        self._game_over = Image(0, 0, "core/view/assets/game/game_end3.png", RESOLUTION)
 
     
-    def draw(self, where: pygame.Surface, board: list[list[int]], score: str, timer: str):
+    def draw(self, where: pygame.Surface, board: list[list[int]], score: int, timer: str, is_game_over: bool, record: int):
         """
         Визуальное отображение всех компонентов
         """
-
+        
         self._background_image.render(where, self._background_image_pos)
         self._char_cell.draw(where)
         self._stats_cell.draw(where)
@@ -120,14 +123,26 @@ class GameMenu:
             for j in range(len(self._game_board[0])):
                 self._game_board[i][j].draw(where)
                 self._game_board_colors[i][j].draw(where)
-        score_text = self._stats_font.render(f"Счёт: {score}", False, (0, 0, 0))
+        record_text = self._stats_font.render("{:,}".format(record).replace(",", "."), False, (0, 0, 0))
+        record_text_rect = record_text.get_rect(center=(self._stats_cell.get_rect().centerx,
+                                                        self._char_cell.get_rect().top + CHAR_CELL_TRANSFORM_RESOLUTION[1] // 8))
+        score_text = self._stats_font.render("{:,}".format(score).replace(",", "."), False, (0, 0, 0))
         score_text_rect = score_text.get_rect(center=(self._stats_cell.get_rect().centerx, 
-                                                      self._stats_cell.get_rect().bottom - STATS_CELL_TRANSFORM_RESOLUTION[1] // 4))
+                                                    self._stats_cell.get_rect().bottom - STATS_CELL_TRANSFORM_RESOLUTION[1] // 3))
         timer_text = self._stats_font.render(f"Время: {timer}", False, (0, 0, 0))
-        timer_text_rect = score_text.get_rect(center=(self._stats_cell.get_rect().centerx, 
-                                                      self._stats_cell.get_rect().top + STATS_CELL_TRANSFORM_RESOLUTION[1] // 4))
+        timer_text_rect = timer_text.get_rect(center=(self._stats_cell.get_rect().centerx, 
+                                                    self._stats_cell.get_rect().top + STATS_CELL_TRANSFORM_RESOLUTION[1] // 3))
+        where.blit(record_text, record_text_rect)
         where.blit(score_text, score_text_rect)
         where.blit(timer_text, timer_text_rect)
+        if is_game_over:
+            score2_text = self._game_over_font.render("{:,}".format(score).replace(",", "."), False, (0, 0, 0))
+            score2_text_rect = score2_text.get_rect(center=(960, 527))
+            back_text = self._stats_font.render("ESC - назад", False, (0, 0, 0))
+            back_text_rect = back_text.get_rect(center=(960, 775))
+            self._game_over.draw(where)
+            where.blit(score2_text, score2_text_rect)
+            where.blit(back_text, back_text_rect)
         pygame.display.flip()
     
     def match_click(self, click_pos: tuple[int, int]):
@@ -145,3 +160,5 @@ class GameMenu:
     def do(self):
         if self.move is not None:
             return self.move
+
+

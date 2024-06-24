@@ -34,12 +34,20 @@ class InputHandler:
                     if current_state == STATE_MAIN_MENU:
                         self.main_menu_keydown(event)
                     if current_state == STATE_GAME:
-                        self.main_menu_keydown(event)
+                        self.game_keydown(event)
     
     def main_menu_keydown(self, event):
         if event.type == pygame.MOUSEBUTTONUP:
             self._event_handler.post(InputEvent(None, pygame.mouse.get_pos()))
     
     def game_keydown(self, event):
-        if event.key == pygame.K_ESCAPE:
-            self._event_handler.post(StateChangeEvent(None))
+        try:
+            if event.type == pygame.MOUSEBUTTONUP:
+                self._event_handler.post(InputEvent(None, pygame.mouse.get_pos()))
+        except:
+            pass
+        try:
+            if event.key == pygame.K_ESCAPE:
+                self._event_handler.post(StateChangeEvent(None))
+        except:
+            pass
