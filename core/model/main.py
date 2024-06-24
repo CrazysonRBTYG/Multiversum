@@ -1,6 +1,7 @@
 import pygame
 import json
 from global_consts import *
+from model.local_consts import *
 from eventmanager.main import *
 from model.match3 import Match3Game
 
@@ -15,9 +16,9 @@ class GameLogic:
         event_handler.add_reciever(self)
         self._is_running: bool = False
         self.state: StateChanger = StateChanger()
-        self._started = False
         self._tick_counter = None
-        self.record = self._json_read("core/stats.json")["record"]
+        self.record = self._json_read(STATS_FILE)["record"]
+        self.available_chars = self._json_read(STATS_FILE)["owned-characters"]
 
     def run(self):
         """
@@ -46,12 +47,13 @@ class GameLogic:
             if self.state.peek() == STATE_GAME:
                 self.game = Match3Game()
                 self.game_over = False
+                self._started = False
         if isinstance(event, TickEvent):
+            self.chosen_char = self._json_read(STATS_FILE)["chosen-character"]
             if self.state.peek() == STATE_GAME:
-                print(self.game.score)
                 if self.game.score > self.record:
                     self.record = self.game.score
-                    self._json_write("core/stats.json", {"record": self.record})
+                    self._json_write(STATS_FILE, "record", self.record)
                 if self._started:
                     if self.game.timer == 0:
                         self.game_over = True
@@ -66,13 +68,17 @@ class GameLogic:
             if self.state.peek() == STATE_GAME:
                 if self.game_over == False:
                     self._started = True
+        if isinstance(event, CharacterChangeEvent):
+            self._json_write(STATS_FILE, "chosen-character", event.character)
     
     def _json_read(self, file_path: str):
         with open(file_path, 'r') as file:
             data = json.load(file)
         return data
 
-    def _json_write(self, file_path: str, data: dict):
+    def _json_write(self, file_path: str, key, value):
+        data = self._json_read(file_path)
+        data[key] = value
         with open(file_path, 'w') as file:
             json.dump(data, file)
         

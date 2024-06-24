@@ -38,7 +38,9 @@ class Drawer:
                 return
             current_state = self._model.state.peek()
             if current_state == STATE_GAME:
-                self._game_menu= view.menus.GameMenu()
+                self._game_menu = view.menus.GameMenu(self._model.chosen_char)
+            if current_state == STATE_COLLECTION:
+                self._collection_menu = view.menus.CollectionMenu(self._model.available_chars, self._model.chosen_char)
         if isinstance(event, TickEvent):
             if not self._is_initialized:
                 return
@@ -58,6 +60,12 @@ class Drawer:
                                     self._delay = None
                 self._game_menu.draw(self._screen, self._model.game.board, self._model.game.score, str(self._model.game.timer),
                                      self._model.game_over, self._model.record)
+            if current_state == STATE_COLLECTION:
+                self._collection_menu.draw(self._screen, self._model.chosen_char)
+                try:
+                    self._event_handler.post(self._collection_menu.do())
+                except:
+                    pass
             self._clock.tick(FPS)
         if isinstance(event, InputEvent):
             if not self._is_initialized:
@@ -72,6 +80,8 @@ class Drawer:
                         if self._model.game.make_move(*self._game_menu.do()) == False:
                             self._model.game.moves += 1
                         self._game_menu.move = None
+            if current_state == STATE_COLLECTION:
+                self._collection_menu.button_click(event.click_pos)
     
     def _initialize(self):
         """

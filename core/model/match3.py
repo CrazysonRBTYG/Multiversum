@@ -6,11 +6,11 @@ class Match3Game:
     def __init__(self, rows=MATCH3_ROWS, cols=MATCH3_COLS, num_types=MATCH3_COLORS):
         self.rows = rows
         self.cols = cols
-        self.num_types = num_types - 1
+        self.num_types = num_types
         self.board = []
         self.moves = 0
         self.score = 0
-        self.timer = 5
+        self.timer = 30
         self.generate_board()
 
     def generate_board(self):
@@ -22,33 +22,45 @@ class Match3Game:
         for row in self.board:
             print(' '.join(map(str, row)))
         print()
-
     def find_matches(self):
         matches = set()
         visited = [[False] * self.cols for _ in range(self.rows)]
 
-        def bfs(row, col):
+        def bfs(row, col, direction):
             queue = deque([(row, col)])
             matched = [(row, col)]
-            visited[row][col] = True
             tile_type = self.board[row][col]
 
-            while queue:
-                r, c = queue.popleft()
-                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                    nr, nc = r + dr, c + dc
-                    if 0 <= nr < self.rows and 0 <= nc < self.cols and not visited[nr][nc] and self.board[nr][nc] == tile_type:
-                        queue.append((nr, nc))
-                        matched.append((nr, nc))
-                        visited[nr][nc] = True
+            if direction == 'H':
+                while queue:
+                    r, c = queue.popleft()
+                    for dc in [-1, 1]:
+                        nc = c + dc
+                        if 0 <= nc < self.cols and self.board[r][nc] == tile_type and (r, nc) not in matched:
+                            queue.append((r, nc))
+                            matched.append((r, nc))
+
+            elif direction == 'V':
+                while queue:
+                    r, c = queue.popleft()
+                    for dr in [-1, 1]:
+                        nr = r + dr
+                        if 0 <= nr < self.rows and self.board[nr][c] == tile_type and (nr, c) not in matched:
+                            queue.append((nr, c))
+                            matched.append((nr, c))
 
             if len(matched) >= 3:
-                matches.update(matched)
+                return matched
+            return []
 
         for row in range(self.rows):
             for col in range(self.cols):
                 if not visited[row][col]:
-                    bfs(row, col)
+                    horizontal_match = bfs(row, col, 'H')
+                    vertical_match = bfs(row, col, 'V')
+                    for r, c in horizontal_match + vertical_match:
+                        visited[r][c] = True
+                        matches.add((r, c))
 
         return list(matches)
 

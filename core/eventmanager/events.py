@@ -53,3 +53,13 @@ class StateChangeEvent(Event):
     def __init__(self, state):
         self._name = "State Change Event"
         self.state = state
+
+
+class CharacterChangeEvent(Event):
+    """
+    Ивент выбора персонажа
+    """
+
+    def __init__(self, character: int):
+        self._name = "Character Change Event"
+        self.character = character
