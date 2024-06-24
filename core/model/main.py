@@ -16,7 +16,8 @@ class GameLogic:
         event_handler.add_reciever(self)
         self._is_running: bool = False
         self.state: StateChanger = StateChanger()
-        self._tick_counter = None
+        self._timer_counter = None
+        self._timer_in_ms = DEFAULT_TIMER
         self.record = self._json_read(STATS_FILE)["record"]
         self.available_chars = self._json_read(STATS_FILE)["owned-characters"]
 
@@ -48,6 +49,11 @@ class GameLogic:
                 self.game = Match3Game()
                 self.game_over = False
                 self._started = False
+                self._ability_cd = CHARACTERS_ABILITIES[self.chosen_char][2]
+                self._is_ability_on_cd: bool = False
+                self._ability_cooldown_start = None
+                self.ability_cd_timer = self._ability_cd
+                self.ability_status: int = ABILITY_READY
         if isinstance(event, TickEvent):
             self.chosen_char = self._json_read(STATS_FILE)["chosen-character"]
             if self.state.peek() == STATE_GAME:
@@ -58,14 +64,42 @@ class GameLogic:
                     if self.game.timer == 0:
                         self.game_over = True
                         self._started = False
-                    if self._tick_counter == None:
-                        self._tick_counter = pygame.time.get_ticks()
+                    if self._timer_counter == None:
+                        self._timer_counter = pygame.time.get_ticks()
                     else:
-                        if pygame.time.get_ticks() - self._tick_counter >= 1000:
+                        if pygame.time.get_ticks() - self._timer_counter >= self._timer_in_ms:
                             self.game.timer -= 1
-                            self._tick_counter = None
+                            self._timer_counter = None
+                if self._is_ability_on_cd and not self.game_over:
+                    if self._ability_cooldown_start == None:
+                        if CHARACTERS_ABILITIES[self.chosen_char][1] != None: # проверка является ли способность удерживающей
+                            if pygame.time.get_ticks() - self._ability_start >= CHARACTERS_ABILITIES[self.chosen_char][1] * 1000:
+                                self._ability_cooldown_start = pygame.time.get_ticks()
+                                self._deuse_ability(self.chosen_char)
+                                self._ability_start = None
+                        else:
+                            self._ability_cooldown_start = pygame.time.get_ticks()
+                    else:
+                        if pygame.time.get_ticks() - self._ability_cooldown_start >= self._ability_cd * 1000:
+                            self._is_ability_on_cd = False
+                            self._ability_cooldown_start = None
+                            self.ability_status = ABILITY_READY
+                        else:
+                            self.ability_status = ABILITY_ON_CD
+                            self.ability_cd_timer = round(self._ability_cd - (pygame.time.get_ticks() - self._ability_cooldown_start) / 1000,
+                                                           2)
         if isinstance(event, InputEvent):
             if self.state.peek() == STATE_GAME:
+                try:
+                    if event.input_key == 'f' or event.input_key == 'F' or event.input_key == 'а' or event.input_key == 'А':
+                        if not self._is_ability_on_cd and self.game_over == False and CHARACTERS_ABILITIES[self.chosen_char][0] != None:
+                            self._is_ability_on_cd = True
+                            if CHARACTERS_ABILITIES[self.chosen_char][1] != None: # проверка является ли способность удерживающей
+                                self._ability_start = pygame.time.get_ticks()
+                                self.ability_status = ABILITY_ACTIVE
+                            self._use_ability(self.chosen_char)
+                except:
+                    pass
                 if self.game_over == False:
                     self._started = True
         if isinstance(event, CharacterChangeEvent):
@@ -81,6 +115,18 @@ class GameLogic:
         data[key] = value
         with open(file_path, 'w') as file:
             json.dump(data, file)
+    
+    def _use_ability(self, character: int):
+        if character == CHAR_NORMIS:
+            pass
+        if character == CHAR_DIO_BRANDO:
+            self._timer_in_ms = CHARACTERS_ABILITIES[self.chosen_char][0]
+    
+    def _deuse_ability(self, character: int):
+        if character == CHAR_NORMIS:
+            pass
+        if character == CHAR_DIO_BRANDO:
+            self._timer_in_ms = DEFAULT_TIMER
         
 class StateChanger:
     """

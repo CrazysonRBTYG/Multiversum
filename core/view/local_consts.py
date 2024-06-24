@@ -60,9 +60,7 @@ MATCH_CELL_H_INC = _match_cell_height * 6 // 7
 CHARACTERS = [{"path": "core/view/assets/collection/characters/normis.png",
                "name": "Нормис"},
               {"path": "core/view/assets/collection/characters/dio-brante.png",
-               "name": "Дио Брандо"},
-              {"path": "core/view/assets/collection/characters/akali.png",
-               "name": "Акали"}]
+               "name": "Дио Брандо"}]
 COLLECTION_MENU_BUTTON_CLICK_SPEED = 0.25
 CHARACTER_IMAGE_COORDS = (RESOLUTION[0] * 735 // 1920, RESOLUTION[1] * 113 // 1080)
 CHARACTER_IMAGE_TRANSFORM_RESOLUTION = (450, 736)

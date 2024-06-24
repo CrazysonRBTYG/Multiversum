@@ -49,6 +49,8 @@ class InputHandler:
         except:
             pass
         try:
+            if event.key == pygame.K_f:
+                self._event_handler.post(InputEvent(event.unicode, None))
             if event.key == pygame.K_ESCAPE:
                 self._event_handler.post(StateChangeEvent(None))
         except:

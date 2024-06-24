@@ -98,10 +98,12 @@ class GameMenu:
         self._game_over = Image(0, 0, "core/view/assets/game/game_end.png", RESOLUTION)
 
     
-    def draw(self, where: pygame.Surface, board: list[list[int]], score: int, timer: str, is_game_over: bool, record: int):
+    def draw(self, where: pygame.Surface, board: list[list[int]], score: int, timer: str, is_game_over: bool, record: int,
+             ability_status: int, ability_cd):
         """
         Визуальное отображение всех компонентов
         """
+        print(ability_status)
         
         BACKGROUND_IMAGE.render(where, BACKGROUND_IMAGE_COORDS)
         self._char_cell.draw(where)
@@ -116,6 +118,17 @@ class GameMenu:
             for j in range(len(self._game_board[0])):
                 self._game_board[i][j].draw(where)
                 self._game_board_colors[i][j].draw(where)
+        if ability_cd == None:
+            ability_text = self._stats_font.render("Нет :(", False, (191, 27, 53))
+        else:
+            if ability_status == ABILITY_READY:
+                ability_text = self._stats_font.render("Готова!", False, (28, 167, 23))
+            elif ability_status == ABILITY_ACTIVE:
+                ability_text = self._stats_font.render("Активно", False, (28, 167, 23))
+            elif ability_status == ABILITY_ON_CD:
+                ability_text = self._stats_font.render(str(ability_cd), False, (191, 27, 53))
+        ability_text_rect = ability_text.get_rect(center=(self._char_cell.get_rect().centerx,
+                                                          self._char_cell.get_rect().top + CHAR_CELL_TRANSFORM_RESOLUTION[1] // 4))
         record_text = self._stats_font.render("{:,}".format(record).replace(",", "."), False, (0, 0, 0))
         record_text_rect = record_text.get_rect(center=(self._char_cell.get_rect().centerx,
                                                         self._char_cell.get_rect().top + CHAR_CELL_TRANSFORM_RESOLUTION[1] // 8))
@@ -125,6 +138,7 @@ class GameMenu:
         timer_text = self._stats_font.render(f"Время: {timer}", False, (0, 0, 0))
         timer_text_rect = timer_text.get_rect(center=(self._stats_cell.get_rect().centerx, 
                                                     self._stats_cell.get_rect().top + STATS_CELL_TRANSFORM_RESOLUTION[1] // 3))
+        where.blit(ability_text, ability_text_rect)
         where.blit(record_text, record_text_rect)
         where.blit(score_text, score_text_rect)
         where.blit(timer_text, timer_text_rect)

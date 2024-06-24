@@ -3,3 +3,7 @@ MATCH3_COLS = 10
 MATCH3_COLORS = 6
 
 STATS_FILE = "core/stats.json"
+
+DEFAULT_TIMER = 1000
+
+CHARACTERS_ABILITIES = [[None, None, None], [2000, 8, 30]]

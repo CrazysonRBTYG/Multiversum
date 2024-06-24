@@ -59,7 +59,7 @@ class Drawer:
                                     self._model.game.drop_tiles()
                                     self._delay = None
                 self._game_menu.draw(self._screen, self._model.game.board, self._model.game.score, str(self._model.game.timer),
-                                     self._model.game_over, self._model.record)
+                                     self._model.game_over, self._model.record, self._model.ability_status, self._model.ability_cd_timer)
             if current_state == STATE_COLLECTION:
                 self._collection_menu.draw(self._screen, self._model.chosen_char)
                 try:

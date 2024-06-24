@@ -32,7 +32,7 @@ class InputEvent(Event):
 
     def __init__(self, input_key, click_position):
         self._name = "Input Event"
-        self._input_key = input_key
+        self.input_key = input_key
         self.click_pos = click_position
 
 
