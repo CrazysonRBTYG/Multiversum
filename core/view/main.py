@@ -1,5 +1,6 @@
 import pygame
 import view.menus
+import time
 from model.main import GameLogic
 from eventmanager.main import *
 from global_consts import *
@@ -19,7 +20,7 @@ class Drawer:
         self._screen: pygame.Surface = None
         self._clock: pygame.time.Clock = None
         self._main_menu: view.menus.MainMenu = view.menus.MainMenu()
-        self._game_menu: view.menus.GameMenu = view.menus.GameMenu()
+        self._delay = None
     
     def update(self, event: Event):
         """
@@ -32,6 +33,12 @@ class Drawer:
             self._is_initialized = False
             pygame.quit()
             exit() # без этого программа продолжает работать в файле controller/main.py (не выявил причину)
+        if isinstance(event, StateChangeEvent):
+            if not self._is_initialized:
+                return
+            current_state = self._model.state.peek()
+            if current_state == STATE_GAME:
+                self._game_menu= view.menus.GameMenu()
         if isinstance(event, TickEvent):
             if not self._is_initialized:
                 return
@@ -40,12 +47,17 @@ class Drawer:
                 self._main_menu.draw(self._screen)
                 self._event_handler.post(self._main_menu.do())
             if current_state == STATE_GAME:
-                self._game_menu.draw(self._screen, self._model.game.board)
+                self._game_menu.draw(self._screen, self._model.game.board, str(self._model.game.score), str(self._model.game.timer))
                 if self._model.game.find_matches():
-                    if self._model.game.remove_matches() != 0:
-                        self._model.game.drop_tiles()
-                        pygame.time.wait(500)
-                self._game_menu.draw(self._screen, self._model.game.board)
+                    if self._delay == None:
+                        self._delay = pygame.time.get_ticks()
+                    else:
+                        if self._model.game.remove_matches() != 0:
+                            if self._delay != None:
+                                if pygame.time.get_ticks() - self._delay >= 800:
+                                    self._model.game.drop_tiles()
+                                    self._delay = None
+                self._game_menu.draw(self._screen, self._model.game.board, str(self._model.game.score), str(self._model.game.timer))
             self._clock.tick(FPS)
         if isinstance(event, InputEvent):
             if not self._is_initialized:

@@ -1,3 +1,4 @@
+import pygame
 from global_consts import *
 from eventmanager.main import *
 from model.match3 import Match3Game
@@ -13,9 +14,6 @@ class GameLogic:
         event_handler.add_reciever(self)
         self._is_running: bool = False
         self.state: StateChanger = StateChanger()
-
-        self.game = Match3Game()
-        self.game_board = self.game.board
     
     def run(self):
         """
@@ -41,9 +39,15 @@ class GameLogic:
                     self._event_handler.post(QuitEvent())
             else:
                 self.state.push(event.state)
+            if self.state.peek() == STATE_GAME:
+                self.game = Match3Game()
+                self.start_ticks = pygame.time.get_ticks()
         if isinstance(event, TickEvent):
             if self.state.peek() == STATE_GAME:
-                self.game_board = self.game.board
+                if self.game.timer == 0:
+                    self.state.push(STATE_GAME_OVER)
+                seconds = (pygame.time.get_ticks() - self.start_ticks) // 1000
+                self.game.timer = 60 - seconds
 
 class StateChanger:
     """

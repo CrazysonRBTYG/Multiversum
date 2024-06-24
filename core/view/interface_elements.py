@@ -43,12 +43,13 @@ class Button(pygame.sprite.Sprite):
         self.is_animating = True
 
 
-class Image:
+class Image():
     """
     Шаблон изображения
     """
 
     def __init__(self, x: int, y: int, path: str, sprite_transform_resolution: tuple[int, int]):
+        super().__init__()
         self.path = path
         self._transform_res = sprite_transform_resolution
         self._xy_rect = (x, y)
@@ -67,3 +68,6 @@ class Image:
         self._sprite: pygame.Surface = pygame.transform.scale(pygame.image.load(path), self._transform_res)
         self.rect = self._sprite.get_rect()
         self.rect.topleft = self._xy_rect
+    
+    def get_rect(self):
+        return self.rect

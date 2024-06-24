@@ -66,7 +66,9 @@ class MainMenu:
 
         if self._is_any_button_clicked and self._are_all_animations_ended:
             pygame.time.wait(MAIN_MENU_BUTTON_WAIT_AFTER_CLICK) # микро пауза (можно отключить)
-            return self._next_event
+            temp = self._next_event
+            self._next_event = None
+            return temp
 
 
 class GameMenu:
@@ -97,9 +99,10 @@ class GameMenu:
             self._game_board_colors.append(temp2)
             self._y_ind += MATCH_CELL_H_INC
             self._x_ind = MATCH_CELL_START_COORDS[0]
+        self._stats_font = pygame.font.Font("core/view/assets/PIXY.ttf", 64)
 
     
-    def draw(self, where: pygame.Surface, board: list[list[int]]):
+    def draw(self, where: pygame.Surface, board: list[list[int]], score: str, timer: str):
         """
         Визуальное отображение всех компонентов
         """
@@ -117,6 +120,14 @@ class GameMenu:
             for j in range(len(self._game_board[0])):
                 self._game_board[i][j].draw(where)
                 self._game_board_colors[i][j].draw(where)
+        score_text = self._stats_font.render(f"Счёт: {score}", False, (0, 0, 0))
+        score_text_rect = score_text.get_rect(center=(self._stats_cell.get_rect().centerx, 
+                                                      self._stats_cell.get_rect().bottom - STATS_CELL_TRANSFORM_RESOLUTION[1] // 4))
+        timer_text = self._stats_font.render(f"Время: {timer}", False, (0, 0, 0))
+        timer_text_rect = score_text.get_rect(center=(self._stats_cell.get_rect().centerx, 
+                                                      self._stats_cell.get_rect().top + STATS_CELL_TRANSFORM_RESOLUTION[1] // 4))
+        where.blit(score_text, score_text_rect)
+        where.blit(timer_text, timer_text_rect)
         pygame.display.flip()
     
     def match_click(self, click_pos: tuple[int, int]):

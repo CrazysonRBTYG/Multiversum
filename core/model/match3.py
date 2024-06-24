@@ -9,6 +9,8 @@ class Match3Game:
         self.num_types = num_types - 1
         self.board = []
         self.moves = 0
+        self.score = 0
+        self.timer = 60
         self.generate_board()
 
     def generate_board(self):
@@ -57,6 +59,8 @@ class Match3Game:
         return len(matches)
 
     def drop_tiles(self):
+        matches = self.find_matches()
+        self.score += len(matches) + 2**len(matches)
         for col in range(self.cols):
             empty_row = self.rows - 1
             for row in range(self.rows - 1, -1, -1):
