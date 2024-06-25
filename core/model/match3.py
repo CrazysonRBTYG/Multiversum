@@ -10,14 +10,14 @@ class Match3Game:
         self.board = []
         self.moves = 0
         self.score = 0
-        self.timer = 5
-        self.generate_board()
+        self.timer = GAME_TIMER
+        self._generate_board()
 
-    def generate_board(self):
+    def _generate_board(self):
         self.board = [[random.randint(1, self.num_types) for _ in range(self.cols)] for _ in range(self.rows)]
         while self.find_matches():
             self.board = [[random.randint(1, self.num_types) for _ in range(self.cols)] for _ in range(self.rows)]
-            
+
     def find_matches(self):
         matches = set()
         visited = [[False] * self.cols for _ in range(self.rows)]
@@ -29,21 +29,21 @@ class Match3Game:
 
             if direction == 'H':
                 while queue:
-                    r, c = queue.popleft()
-                    for dc in [-1, 1]:
-                        nc = c + dc
-                        if 0 <= nc < self.cols and self.board[r][nc] == tile_type and (r, nc) not in matched:
-                            queue.append((r, nc))
-                            matched.append((r, nc))
+                    row, col = queue.popleft()
+                    for direction in [-1, 1]:
+                        next_col = col + direction
+                        if 0 <= next_col < self.cols and self.board[row][next_col] == tile_type and (row, next_col) not in matched:
+                            queue.append((row, next_col))
+                            matched.append((row, next_col))
 
             elif direction == 'V':
                 while queue:
-                    r, c = queue.popleft()
-                    for dr in [-1, 1]:
-                        nr = r + dr
-                        if 0 <= nr < self.rows and self.board[nr][c] == tile_type and (nr, c) not in matched:
-                            queue.append((nr, c))
-                            matched.append((nr, c))
+                    row, col = queue.popleft()
+                    for direction in [-1, 1]:
+                        next_row = row + direction
+                        if 0 <= next_row < self.rows and self.board[next_row][col] == tile_type and (next_row, col) not in matched:
+                            queue.append((next_row, col))
+                            matched.append((next_row, col))
 
             if len(matched) >= 3:
                 return matched
@@ -54,9 +54,9 @@ class Match3Game:
                 if not visited[row][col]:
                     horizontal_match = bfs(row, col, 'H')
                     vertical_match = bfs(row, col, 'V')
-                    for r, c in horizontal_match + vertical_match:
-                        visited[r][c] = True
-                        matches.add((r, c))
+                    for row, col in horizontal_match + vertical_match:
+                        visited[row][col] = True
+                        matches.add((row, col))
 
         return list(matches)
 
@@ -68,9 +68,9 @@ class Match3Game:
 
     def drop_tiles(self):
         matches = self.find_matches()
-        self.score += len(matches) + 2**len(matches)
+        self.score += SCORE_ADD_VALUE(matches)
         if self.timer != 0:
-            self.timer += len(matches) // 2
+            self.timer += TIME_ADD_VALUE(matches)
         for col in range(self.cols):
             empty_row = self.rows - 1
             for row in range(self.rows - 1, -1, -1):

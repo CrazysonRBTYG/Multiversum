@@ -66,7 +66,7 @@ class GameLogic:
                         self._json_write(STATS_FILE, "money", self._money+self.game.score)
                         self._json_write(STATS_FILE, "record", self.game.score)
                     else:
-                        self._json_write(STATS_FILE, "money", self._money+self.game.score//10)
+                        self._json_write(STATS_FILE, "money", self._money + SCORE_DECREASE(self.game.score))
                 if self._started:
                     if self.game.timer == 0:
                         self.game_over = True
@@ -80,20 +80,20 @@ class GameLogic:
                 if self._is_ability_on_cd and not self.game_over:
                     if self._ability_cooldown_start == None:
                         if CHARACTERS[self.chosen_char]["ability"][1] != None: # проверка является ли способность удерживающей
-                            if pygame.time.get_ticks() - self._ability_start >= CHARACTERS[self.chosen_char]["ability"][1] * 1000:
+                            if pygame.time.get_ticks() - self._ability_start >= CHARACTERS[self.chosen_char]["ability"][1] * DEFAULT_TIMER:
                                 self._ability_cooldown_start = pygame.time.get_ticks()
                                 self._deuse_ability(self.chosen_char)
                                 self._ability_start = None
                         else:
                             self._ability_cooldown_start = pygame.time.get_ticks()
                     else:
-                        if pygame.time.get_ticks() - self._ability_cooldown_start >= self._ability_cd * 1000:
+                        if pygame.time.get_ticks() - self._ability_cooldown_start >= self._ability_cd * DEFAULT_TIMER:
                             self._is_ability_on_cd = False
                             self._ability_cooldown_start = None
                             self.ability_status = ABILITY_READY
                         else:
                             self.ability_status = ABILITY_ON_CD
-                            self.ability_cd_timer = round(self._ability_cd - (pygame.time.get_ticks() - self._ability_cooldown_start) / 1000,
+                            self.ability_cd_timer = round(self._ability_cd - (pygame.time.get_ticks() - self._ability_cooldown_start) / DEFAULT_TIMER,
                                                            2)
             if self.state.peek() == STATE_SHOP:
                 self.money = self._json_read(STATS_FILE)["money"]

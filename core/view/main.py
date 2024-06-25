@@ -51,13 +51,15 @@ class Drawer:
                 self._main_menu.draw(self._screen)
                 self._event_handler.post(self._main_menu.do())
             if current_state == STATE_GAME:
+                self._busy = False
                 if self._model.game.find_matches():
+                    self._busy = True
                     if self._delay == None:
                         self._delay = pygame.time.get_ticks()
                     else:
                         if self._model.game.remove_matches() != 0:
                             if self._delay != None:
-                                if pygame.time.get_ticks() - self._delay >= 800:
+                                if pygame.time.get_ticks() - self._delay >= MATCHES_BREAK_DELAY:
                                     self._model.game.drop_tiles()
                                     self._delay = None
                 self._game_menu.draw(self._screen, self._model.game.board, self._model.game.score, str(self._model.game.timer),
@@ -79,7 +81,7 @@ class Drawer:
             if current_state == STATE_MAIN_MENU:
                 self._main_menu.button_click(event.click_pos)
             if current_state == STATE_GAME:
-                if self._model.game_over == False:
+                if self._model.game_over == False and self._busy == False:
                     self._game_menu.match_click(event.click_pos)
                     if self._game_menu.do() is not None:
                         if self._model.game.make_move(*self._game_menu.do()) == False:

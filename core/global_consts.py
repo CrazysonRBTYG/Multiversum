@@ -21,7 +21,7 @@ CHARACTERS = {CHAR_NORMIS: {"path": "core/view/assets/collection/characters/norm
                                 "ability": [2000, 8, 30]},
               CHAR_AKALI: {"path": "core/view/assets/collection/characters/akali.png",
                            "banner-path": None,
-                           "name": "Люк Скай",
+                           "name": "Акали",
                            "ability": [None, None, None]},
               CHAR_GRINCH: {"path": "core/view/assets/collection/characters/grinch.png",
                             "banner-path": "core/view/assets/shop/banners/grinch-banner.png",

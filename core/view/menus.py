@@ -93,8 +93,8 @@ class GameMenu:
             self._game_board_colors.append(temp2)
             self._y_ind += MATCH_CELL_H_INC
             self._x_ind = MATCH_CELL_START_COORDS[0]
-        self._stats_font = pygame.font.Font(FONT, 64)
-        self._game_over_font = pygame.font.Font(FONT, 150)
+        self._stats_font = pygame.font.Font(FONT, RESOLUTION[0] * 64 // 1920)
+        self._game_over_font = pygame.font.Font(FONT, RESOLUTION[0] * 150 // 1920)
         self._game_over = Image(0, 0, "core/view/assets/game/game_end.png", RESOLUTION)
 
     
@@ -143,9 +143,9 @@ class GameMenu:
         where.blit(timer_text, timer_text_rect)
         if is_game_over:
             score2_text = self._game_over_font.render("{:,}".format(score).replace(",", "."), False, (0, 0, 0))
-            score2_text_rect = score2_text.get_rect(center=(960, 527))
+            score2_text_rect = score2_text.get_rect(center=(RESOLUTION[0] * 960 // 1920, RESOLUTION[1] * 527 // 1080))
             back_text = self._stats_font.render("ESC - назад", False, (0, 0, 0))
-            back_text_rect = back_text.get_rect(center=(960, 775))
+            back_text_rect = back_text.get_rect(center=(RESOLUTION[0] * 960 // 1920, RESOLUTION[1] * 775 // 1080))
             self._game_over.draw(where)
             where.blit(score2_text, score2_text_rect)
             where.blit(back_text, back_text_rect)
@@ -178,7 +178,7 @@ class CollectionMenu:
         for i in range(len(self._available_characters)):
             if self._available_characters[i] == chosen_character:
                 self._pointer: int = i
-        self._font: pygame.font.Font = pygame.font.Font(FONT, 64)
+        self._font: pygame.font.Font = pygame.font.Font(FONT, RESOLUTION[0] * 64 // 1920)
         self._text_rect = (self._characters_images[0].get_rect().centerx, 
                            self._characters_images[0].get_rect().top + CHAR_CELL_TRANSFORM_RESOLUTION[1] // 8)
         self._choose_button_on: Button = Button(CHOOSE_BUTTON_FUNC, *CHOOSE_BUTTON_ON_COORDS,
@@ -207,11 +207,11 @@ class CollectionMenu:
         """
 
         BACKGROUND_IMAGE.render(where, BACKGROUND_IMAGE_COORDS)
-        color = (0, 0, 0)
+        color = BLACK
         if self._available_characters[self._pointer] == chosen_character:
             self._choose_button_off.draw(where)
             self._choose_button_on.disabled = True
-            color = (28, 167, 23)
+            color = GREEN
         else:
             self._choose_button_on.disabled = False
             self._choose_button_on_animations.draw(where)
@@ -280,15 +280,16 @@ class CollectionMenu:
 
 class Shop:
     def __init__(self):
-        self._banner = Image(496, 141, CHARACTERS[CURRENT_BANNER_CHAR]["banner-path"], (928, 600))
+        self._banner = Image(RESOLUTION[0] * 496 // 1920, RESOLUTION[1] * 141 // 1080,
+                             CHARACTERS[CURRENT_BANNER_CHAR]["banner-path"], (RESOLUTION[0] * 928 // 1920, RESOLUTION[1] * 600 // 1080))
         self._spin_button_on = Button(SPIN_BUTTON_FUNC, *SPIN_BUTTON_ON_COORDS, 
                                       SPIN_BUTTON_ON_PATH, SPIN_BUTTON_TRANSFORM_RESOLUTION)
         self._spin_button_off = Image(*SPIN_BUTTON_OFF_COORDS, SPIN_BUTTON_OFF_PATH, SPIN_BUTTON_TRANSFORM_RESOLUTION)
-        self._font = pygame.font.Font(FONT, 29)
-        self._font_rect = (585, 684)
-        self._stats_font = pygame.font.Font(FONT, 96)
-        self._money_font_rect = (12, 1075)
-        self._percents_font_rect = (12, 1000)
+        self._font = pygame.font.Font(FONT, RESOLUTION[0] * 29 // 1920)
+        self._font_rect = (RESOLUTION[0] * 585 // 1920, RESOLUTION[1] * 684 // 1080)
+        self._stats_font = pygame.font.Font(FONT, RESOLUTION[0] * 96 // 1920)
+        self._money_font_rect = (RESOLUTION[0] * 12 // 1920, RESOLUTION[1] * 1075 // 1080)
+        self._percents_font_rect = (RESOLUTION[0] * 12 // 1920, RESOLUTION[1] * 1000 // 1080)
         self._animations: pygame.sprite.Group = pygame.sprite.Group(self._spin_button_on)
         self._is_spin_button_clicked: bool = False
         self._all_animations_ended: bool = False
