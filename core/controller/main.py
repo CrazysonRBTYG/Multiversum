@@ -29,6 +29,8 @@ class InputHandler:
                         self.game_keydown(event)
                     if current_state == STATE_COLLECTION:
                         self.collection_keydown(event)
+                    if current_state  == STATE_SHOP:
+                        self.shop_keydown(event)
                 if event.type == pygame.MOUSEBUTTONUP:
                     current_state = self._model.state.peek()
                     if current_state == STATE_MAIN_MENU:
@@ -37,6 +39,8 @@ class InputHandler:
                         self.game_keydown(event)
                     if current_state == STATE_COLLECTION:
                         self.collection_keydown(event)
+                    if current_state  == STATE_SHOP:
+                        self.shop_keydown(event)
     
     def main_menu_keydown(self, event):
         if event.type == pygame.MOUSEBUTTONUP:
@@ -57,6 +61,18 @@ class InputHandler:
             pass
     
     def collection_keydown(self, event):
+        try:
+            if event.type == pygame.MOUSEBUTTONUP:
+                self._event_handler.post(InputEvent(None, pygame.mouse.get_pos()))
+        except:
+            pass
+        try:
+            if event.key == pygame.K_ESCAPE:
+                self._event_handler.post(StateChangeEvent(None))
+        except:
+            pass
+    
+    def shop_keydown(self, event):
         try:
             if event.type == pygame.MOUSEBUTTONUP:
                 self._event_handler.post(InputEvent(None, pygame.mouse.get_pos()))

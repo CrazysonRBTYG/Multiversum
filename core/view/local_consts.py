@@ -24,6 +24,8 @@ MAIN_MENU_BUTTONS = {"PLAY": {"path": "core/view/assets/main_menu/play_button",
                               "func": StateChangeEvent(STATE_GAME)},
                     "COLLECTION": {"path": "core/view/assets/main_menu/collection_button",
                                    "func": StateChangeEvent(STATE_COLLECTION)},
+                    "SHOP": {"path": "core/view/assets/main_menu/shop_button",
+                             "func": StateChangeEvent(STATE_SHOP)},
                     "EXIT": {"path": "core/view/assets/main_menu/exit_button",
                              "func": QuitEvent()}}
 _buttons_amount = len(MAIN_MENU_BUTTONS)
@@ -57,10 +59,6 @@ MATCH_CELL_W_INC = _match_cell_width * 6 // 7
 MATCH_CELL_H_INC = _match_cell_height * 6 // 7
 
 # COLLECTION
-CHARACTERS = [{"path": "core/view/assets/collection/characters/normis.png",
-               "name": "Нормис"},
-              {"path": "core/view/assets/collection/characters/dio-brante.png",
-               "name": "Дио Брандо"}]
 COLLECTION_MENU_BUTTON_CLICK_SPEED = 0.25
 CHARACTER_IMAGE_COORDS = (RESOLUTION[0] * 735 // 1920, RESOLUTION[1] * 113 // 1080)
 CHARACTER_IMAGE_TRANSFORM_RESOLUTION = (450, 736)
@@ -81,3 +79,19 @@ RIGHT_BUTTON_ON_COORDS = (RESOLUTION[0] * 1220 // 1920, RESOLUTION[1] * 480 // 1
 RIGHT_BUTTON_ON_PATH = "core/view/assets/collection/right_button"
 RIGHT_BUTTON_OFF_COORDS = (RESOLUTION[0] * 1200 // 1920, RESOLUTION[1] * 440 // 1080)
 RIGHT_BUTTON_OFF_PATH = "core/view/assets/collection/right_button/3.png"
+
+# SHOP
+SHOP_MENU_BUTTON_CLICK_SPEED = 0.5
+SPIN_BUTTON_ON_COORDS = (RESOLUTION[0] // 2, RESOLUTION[1] * 872 // 1080)
+SPIN_BUTTON_TRANSFORM_RESOLUTION = (RESOLUTION[0] * 652 // 1920, RESOLUTION[1] * 149 // 1080)
+SPIN_BUTTON_ON_PATH = "core/view/assets/shop/spin_button"
+SPIN_BUTTON_FUNC = SpinEvent()
+SPIN_BUTTON_OFF_COORDS = (637, 798)
+SPIN_BUTTON_OFF_PATH = "core/view/assets/shop/spin_button/3.png"
+
+# COLORS
+BLACK = (0, 0, 0)
+GREEN = (28, 167, 23)
+RED = (191, 27, 53)
+WHITE = (255, 255, 255)
+YELLOW = (180, 169, 25)

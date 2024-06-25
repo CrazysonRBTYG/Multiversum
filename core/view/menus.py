@@ -118,14 +118,14 @@ class GameMenu:
                 self._game_board[i][j].draw(where)
                 self._game_board_colors[i][j].draw(where)
         if ability_cd == None:
-            ability_text = self._stats_font.render("Нет :(", False, (191, 27, 53))
+            ability_text = self._stats_font.render("Нет :(", False, RED)
         else:
             if ability_status == ABILITY_READY:
-                ability_text = self._stats_font.render("Готова!", False, (28, 167, 23))
+                ability_text = self._stats_font.render("Готова!", False, GREEN)
             elif ability_status == ABILITY_ACTIVE:
-                ability_text = self._stats_font.render("Активно", False, (28, 167, 23))
+                ability_text = self._stats_font.render("Активно", False, GREEN)
             elif ability_status == ABILITY_ON_CD:
-                ability_text = self._stats_font.render(str(ability_cd), False, (191, 27, 53))
+                ability_text = self._stats_font.render(str(ability_cd), False, RED)
         ability_text_rect = ability_text.get_rect(center=(self._char_cell.get_rect().centerx,
                                                           self._char_cell.get_rect().top + CHAR_CELL_TRANSFORM_RESOLUTION[1] // 4))
         record_text = self._stats_font.render("{:,}".format(record).replace(",", "."), False, (0, 0, 0))
@@ -275,4 +275,71 @@ class CollectionMenu:
             self._next_event = None
             if type(temp) == int:
                 self._pointer = temp
+            return temp
+
+
+class Shop:
+    def __init__(self):
+        self._banner = Image(496, 141, CHARACTERS[CURRENT_BANNER_CHAR]["banner-path"], (928, 600))
+        self._spin_button_on = Button(SPIN_BUTTON_FUNC, *SPIN_BUTTON_ON_COORDS, 
+                                      SPIN_BUTTON_ON_PATH, SPIN_BUTTON_TRANSFORM_RESOLUTION)
+        self._spin_button_off = Image(*SPIN_BUTTON_OFF_COORDS, SPIN_BUTTON_OFF_PATH, SPIN_BUTTON_TRANSFORM_RESOLUTION)
+        self._font = pygame.font.Font(FONT, 29)
+        self._font_rect = (585, 684)
+        self._stats_font = pygame.font.Font(FONT, 96)
+        self._money_font_rect = (12, 1075)
+        self._percents_font_rect = (12, 1000)
+        self._animations: pygame.sprite.Group = pygame.sprite.Group(self._spin_button_on)
+        self._is_spin_button_clicked: bool = False
+        self._all_animations_ended: bool = False
+    
+    def draw(self, where: pygame.Surface, money_value: int, available_characters: list[int], chance):
+        BACKGROUND_IMAGE.render(where, BACKGROUND_IMAGE_COORDS)
+        is_but_animating: bool = False
+        self._banner.draw(where)
+        self._price_text = self._font.render("{:,}".format(SPIN_COST).replace(",", "."), False, BLACK)
+        self._price_text_rect = self._price_text.get_rect(center=self._font_rect)
+        self._money_text = self._stats_font.render("{:,}".format(money_value).replace(",", "."), False, WHITE)
+        self._money_text_rect = self._money_text.get_rect(bottomleft=self._money_font_rect)
+        if chance <= 0.3:
+            percents_color = RED
+        elif chance <= 0.7:
+            percents_color = YELLOW
+        else:
+            percents_color = GREEN
+        self._percents_text = self._stats_font.render('{:.2%}'.format(chance), False, percents_color)
+        self._percents_text_rect = self._percents_text.get_rect(bottomleft=self._percents_font_rect)
+        where.blit(self._money_text, self._money_text_rect)
+        where.blit(self._price_text, self._price_text_rect)
+        if CURRENT_BANNER_CHAR in available_characters:
+            self._spin_button_off.draw(where)
+            self._spin_button_on.disabled = True
+        else:
+            where.blit(self._percents_text, self._percents_text_rect)
+            self._animations.draw(where)
+            self._animations.update(speed=SHOP_MENU_BUTTON_CLICK_SPEED)
+        if self._spin_button_on.rect.collidepoint(pygame.mouse.get_pos()) and self._spin_button_on.disabled == False:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+        else:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+        if self._spin_button_on.is_animating:
+            is_but_animating = True
+        self._all_animations_ended = is_but_animating
+        pygame.display.flip()
+    
+    def button_click(self, click_pos: tuple[int, int]):
+        """
+        Нажатие на кнопку и получение следующего события после него
+        """
+        if self._spin_button_on.rect.collidepoint(click_pos):
+            if self._spin_button_on.disabled == False:
+                self._spin_button_on.click()
+                self._is_spin_button_clicked = True
+                self._next_event = self._spin_button_on.func
+        
+    def do(self):
+        if self._is_spin_button_clicked and self._all_animations_ended:
+            self._is_any_button_clicked = False
+            temp = self._next_event
+            self._next_event = None
             return temp

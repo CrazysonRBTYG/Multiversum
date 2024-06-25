@@ -17,11 +17,7 @@ class Match3Game:
         self.board = [[random.randint(1, self.num_types) for _ in range(self.cols)] for _ in range(self.rows)]
         while self.find_matches():
             self.board = [[random.randint(1, self.num_types) for _ in range(self.cols)] for _ in range(self.rows)]
-
-    def print_board(self):
-        for row in self.board:
-            print(' '.join(map(str, row)))
-        print()
+            
     def find_matches(self):
         matches = set()
         visited = [[False] * self.cols for _ in range(self.rows)]
@@ -74,7 +70,7 @@ class Match3Game:
         matches = self.find_matches()
         self.score += len(matches) + 2**len(matches)
         if self.timer != 0:
-            self.timer += len(matches) // 3
+            self.timer += len(matches) // 2
         for col in range(self.cols):
             empty_row = self.rows - 1
             for row in range(self.rows - 1, -1, -1):

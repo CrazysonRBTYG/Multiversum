@@ -4,6 +4,7 @@ from global_consts import *
 from model.local_consts import *
 from eventmanager.main import *
 from model.match3 import Match3Game
+from model.gacha import GachaSystem
 
 
 class GameLogic:
@@ -16,6 +17,7 @@ class GameLogic:
         event_handler.add_reciever(self)
         self._is_running: bool = False
         self.state: StateChanger = StateChanger()
+        self._gacha: GachaSystem = GachaSystem()
         self._timer_counter = None
         self._timer_in_ms = DEFAULT_TIMER
 
@@ -43,13 +45,12 @@ class GameLogic:
                     self._event_handler.post(QuitEvent())
             else:
                 self.state.push(event.state)
-            self.available_chars = self._json_read(STATS_FILE)["owned-characters"]
             if self.state.peek() == STATE_GAME:
                 self.game = Match3Game()
                 self.game_over = False
                 self.record = self._json_read(STATS_FILE)["record"]
                 self._started = False
-                self._ability_cd = CHARACTERS_ABILITIES[self.chosen_char][2]
+                self._ability_cd = CHARACTERS[self.chosen_char]["ability"][2]
                 self._is_ability_on_cd: bool = False
                 self._ability_cooldown_start = None
                 self.ability_cd_timer = self._ability_cd
@@ -57,6 +58,7 @@ class GameLogic:
                 self._money = self._json_read(STATS_FILE)["money"]
                 self.money_not_added = True
         if isinstance(event, TickEvent):
+            self.available_chars = self._json_read(STATS_FILE)["owned-characters"]
             self.chosen_char = self._json_read(STATS_FILE)["chosen-character"]
             if self.state.peek() == STATE_GAME:
                 if self.game_over:
@@ -77,8 +79,8 @@ class GameLogic:
                             self._timer_counter = None
                 if self._is_ability_on_cd and not self.game_over:
                     if self._ability_cooldown_start == None:
-                        if CHARACTERS_ABILITIES[self.chosen_char][1] != None: # проверка является ли способность удерживающей
-                            if pygame.time.get_ticks() - self._ability_start >= CHARACTERS_ABILITIES[self.chosen_char][1] * 1000:
+                        if CHARACTERS[self.chosen_char]["ability"][1] != None: # проверка является ли способность удерживающей
+                            if pygame.time.get_ticks() - self._ability_start >= CHARACTERS[self.chosen_char]["ability"][1] * 1000:
                                 self._ability_cooldown_start = pygame.time.get_ticks()
                                 self._deuse_ability(self.chosen_char)
                                 self._ability_start = None
@@ -93,13 +95,17 @@ class GameLogic:
                             self.ability_status = ABILITY_ON_CD
                             self.ability_cd_timer = round(self._ability_cd - (pygame.time.get_ticks() - self._ability_cooldown_start) / 1000,
                                                            2)
+            if self.state.peek() == STATE_SHOP:
+                self.money = self._json_read(STATS_FILE)["money"]
+                rolled = self._json_read(STATS_FILE)["rolled"]
+                self.chance = self._gacha.get_probability(rolled)
         if isinstance(event, InputEvent):
             if self.state.peek() == STATE_GAME:
                 try:
                     if event.input_key == 'f' or event.input_key == 'F' or event.input_key == 'а' or event.input_key == 'А':
-                        if not self._is_ability_on_cd and self.game_over == False and CHARACTERS_ABILITIES[self.chosen_char][0] != None:
+                        if not self._is_ability_on_cd and self.game_over == False and CHARACTERS[self.chosen_char]["ability"][0] != None:
                             self._is_ability_on_cd = True
-                            if CHARACTERS_ABILITIES[self.chosen_char][1] != None: # проверка является ли способность удерживающей
+                            if CHARACTERS[self.chosen_char]["ability"][1] != None: # проверка является ли способность удерживающей
                                 self._ability_start = pygame.time.get_ticks()
                                 self.ability_status = ABILITY_ACTIVE
                             self._use_ability(self.chosen_char)
@@ -109,6 +115,18 @@ class GameLogic:
                     self._started = True
         if isinstance(event, CharacterChangeEvent):
             self._json_write(STATS_FILE, "chosen-character", event.character)
+        if isinstance(event, SpinEvent):
+            money = self._json_read(STATS_FILE)["money"]
+            if money >= SPIN_COST:
+                self._json_write(STATS_FILE, "money", money - SPIN_COST)
+                rolled = self._json_read(STATS_FILE)["rolled"]
+                if self._gacha.roll(rolled):
+                    chars = self._json_read(STATS_FILE)["owned-characters"]
+                    chars.append(CURRENT_BANNER_CHAR)
+                    self._json_write(STATS_FILE, "owned-characters", chars)
+                    self._json_write(STATS_FILE, "rolled", 0)
+                else:
+                    self._json_write(STATS_FILE, "rolled", rolled + 1)
     
     def _json_read(self, file_path: str):
         with open(file_path, 'r') as file:
@@ -122,14 +140,12 @@ class GameLogic:
             json.dump(data, file)
     
     def _use_ability(self, character: int):
-        if character == CHAR_NORMIS:
-            pass
         if character == CHAR_DIO_BRANDO:
-            self._timer_in_ms = CHARACTERS_ABILITIES[self.chosen_char][0]
+            self._timer_in_ms = CHARACTERS[character]["ability"][0]
+        if character == CHAR_GRINCH:
+            self.game.score = CHARACTERS[character]["ability"][0](self.game.score)
     
     def _deuse_ability(self, character: int):
-        if character == CHAR_NORMIS:
-            pass
         if character == CHAR_DIO_BRANDO:
             self._timer_in_ms = DEFAULT_TIMER
         

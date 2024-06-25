@@ -63,3 +63,12 @@ class CharacterChangeEvent(Event):
     def __init__(self, character: int):
         self._name = "Character Change Event"
         self.character = character
+
+
+class SpinEvent(Event):
+    """
+    Ивент крутки в магазине
+    """
+
+    def __init__(self):
+        self._name = "Spin Event"
