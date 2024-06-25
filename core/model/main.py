@@ -18,8 +18,6 @@ class GameLogic:
         self.state: StateChanger = StateChanger()
         self._timer_counter = None
         self._timer_in_ms = DEFAULT_TIMER
-        self.record = self._json_read(STATS_FILE)["record"]
-        self.available_chars = self._json_read(STATS_FILE)["owned-characters"]
 
     def run(self):
         """
@@ -45,21 +43,28 @@ class GameLogic:
                     self._event_handler.post(QuitEvent())
             else:
                 self.state.push(event.state)
+            self.available_chars = self._json_read(STATS_FILE)["owned-characters"]
             if self.state.peek() == STATE_GAME:
                 self.game = Match3Game()
                 self.game_over = False
+                self.record = self._json_read(STATS_FILE)["record"]
                 self._started = False
                 self._ability_cd = CHARACTERS_ABILITIES[self.chosen_char][2]
                 self._is_ability_on_cd: bool = False
                 self._ability_cooldown_start = None
                 self.ability_cd_timer = self._ability_cd
                 self.ability_status: int = ABILITY_READY
+                self._money = self._json_read(STATS_FILE)["money"]
+                self.money_not_added = True
         if isinstance(event, TickEvent):
             self.chosen_char = self._json_read(STATS_FILE)["chosen-character"]
             if self.state.peek() == STATE_GAME:
-                if self.game.score > self.record:
-                    self.record = self.game.score
-                    self._json_write(STATS_FILE, "record", self.record)
+                if self.game_over:
+                    if self.game.score > self.record:
+                        self._json_write(STATS_FILE, "money", self._money+self.game.score)
+                        self._json_write(STATS_FILE, "record", self.game.score)
+                    else:
+                        self._json_write(STATS_FILE, "money", self._money+self.game.score//10)
                 if self._started:
                     if self.game.timer == 0:
                         self.game_over = True

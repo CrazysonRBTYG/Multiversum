@@ -103,7 +103,6 @@ class GameMenu:
         """
         Визуальное отображение всех компонентов
         """
-        print(ability_status)
         
         BACKGROUND_IMAGE.render(where, BACKGROUND_IMAGE_COORDS)
         self._char_cell.draw(where)

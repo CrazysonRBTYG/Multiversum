@@ -10,7 +10,7 @@ class Match3Game:
         self.board = []
         self.moves = 0
         self.score = 0
-        self.timer = 30
+        self.timer = 5
         self.generate_board()
 
     def generate_board(self):
